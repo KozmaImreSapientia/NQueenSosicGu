@@ -11,7 +11,24 @@ namespace NQueenSusicGu
     {
         static void Main(string[] args)
         {
-            NQueenSusic(1000);
+            //NQueenSusic(1000);
+
+            //int[] testQueen = new int[6] { 1,5,0,2,3,4 };
+            //int C = CalculateDiagonalCollisions(testQueen);
+
+
+            int[] tests = new int[11] { 4, 6, 10, 25, 50, 100, 200, 300, 500, 1000, 10000 };
+
+            foreach (int i in tests)
+            {
+                Console.Write(i + " : ");
+                NQueenSusic(i);
+            }
+
+            Console.WriteLine("Done");
+            while (true)
+                Console.Read();
+
         }
 
         /// <summary>
@@ -25,23 +42,25 @@ namespace NQueenSusicGu
             Stopwatch sw;
             do {
                 queen = InitializeWithRandomPermutation(n);
-                Console.WriteLine("Initial state:");
+                //Console.WriteLine("Initial state:");
                 PrintQueens(queen);
                 int attackScore;
                 sw = new Stopwatch();
                 sw.Start();
                 noOfCollisions = CalculateCollisions(queen);
+                //noOfCollisions = CalculateDiagonalCollisions(queen);
                 do {
                     noOfSwaps = 0;
                     for (int i = 0; i < n; ++i)
                     {
                         for (int j = i + 1; j < n; ++j)
                         {
-                            Console.WriteLine("hgdszz");
+                            //Console.WriteLine("hgdszz");
                             if (IsAttacked(queen, i, out attackScore) || IsAttacked(queen, j, out attackScore))
                             {
                                 int[] secondBoard = Swap(queen, i, j);
                                 int noOfCol = CalculateCollisions(secondBoard);
+                                //int noOfCol = CalculateDiagonalCollisions(secondBoard);
                                 if (noOfCol < noOfCollisions)
                                 {
                                     queen = secondBoard;
@@ -55,7 +74,7 @@ namespace NQueenSusicGu
             } while (noOfCollisions != 0);
             sw.Stop();
             Console.WriteLine($"Time needed: {sw.Elapsed}");
-            Console.WriteLine("Solved state");
+            //Console.WriteLine("Solved state");
             PrintQueens(queen);
         }
 
@@ -70,7 +89,7 @@ namespace NQueenSusicGu
 
             /*for(int i = 0; i < n; i++)
             {
-                Console.Write(array[i]+" ");
+                //Console.Write(array[i]+" ");
             }*/
 
             FisherYatesShuffle(array);
@@ -78,7 +97,7 @@ namespace NQueenSusicGu
             /*Console.WriteLine();
             for (int i = 0; i < n; i++)
             {
-                Console.Write(array[i] + " ");
+                //Console.Write(array[i] + " ");
             }*/
 
             return array;
@@ -192,6 +211,193 @@ namespace NQueenSusicGu
             return finalAttackScore;
         }
 
+        private static int CalculateDiagonalCollisions(int[] queen)
+        {
+            // Calculate main and secondary diagonals:
+            int[] mDiag = AttackCounterOnMainDiagonal(queen);
+            int[] sDiag = AttackCounterOnSecondaryDiagonal(queen);
+
+            // Calculate collision count:
+            int counter = 0;
+
+            foreach(int item in mDiag)
+            {
+                if( item > 1)
+                {
+                    counter++;
+                }
+            }
+
+            foreach (int item in sDiag)
+            {
+                if (item > 1)
+                {
+                    counter++;
+                }
+            }
+
+            return counter;
+        }
+
+        private static int[] AttackCounterOnMainDiagonal(int[] queen)
+        {
+            int n = queen.GetLength(0);
+            bool isUsed = false;
+            int[] mDiag = new int[ 2*n-1 ];
+            int diagRowCount;
+
+            /* 
+             3    4 5 6 <=== mDiag array
+             2 \   \ \ \
+             1 \ \   \ \
+             0 \ \ \   \ <-- upper part
+               \ \ \ \ <-- lower part
+            so: */
+
+            // lower part
+            diagRowCount = n - 1; // ! ! !
+
+            for (int i = 0; i < n; ++i)
+            {
+                int x = i;
+                for (int j = 0; j < n; ++j)
+                {
+                    int y = j;
+                    while (x < n && y < n)
+                    {
+                        //Console.Write("[" + x + "," + y + "]");
+                        if( queen[x] == y )
+                        {
+                            mDiag[diagRowCount]++;
+                            //Console.Write("* ");
+                        }  
+                            
+                        ++x;
+                        ++y;
+                        isUsed = false;
+                    }
+                    if (!isUsed)
+                    {
+                        isUsed = true;
+                    }
+                }
+                //Console.WriteLine();
+                --diagRowCount;
+            }
+
+            // upper part
+            diagRowCount = n; // ! ! !
+
+            isUsed = false;
+            for (int k = 0; k < n; ++k)
+            {
+                int x = 0;
+                for (int j = k + 1; j < n; ++j)
+                {
+                    int y = j;
+                    while (x < n - k - 1 && y < n)
+                    {
+                        //Console.Write("[" + x + "," + y + "] ");
+                        if (queen[x] == y)
+                        {
+                            mDiag[diagRowCount]++;
+                            //Console.Write("* ");
+                        }
+
+                        ++x;
+                        ++y;
+                        isUsed = false;
+                    }
+                    if (!isUsed)
+                    {
+                        isUsed = true;
+                    }
+                }
+                //Console.WriteLine();
+                diagRowCount++;
+            }
+
+            return mDiag;
+        }
+
+        private static int[] AttackCounterOnSecondaryDiagonal(int[] queen)
+        {
+            int n = queen.GetLength(0);
+            bool isUsed = false;
+            int[] sDiag = new int[2 * n - 1];
+            //int tokencount = 0;
+            int diagRowCount;
+
+            /*  mDiag array
+              0 1 2 3       <-- upper part
+             / / / /    4
+             / / /    / 5
+             / /    / / 6
+             /    / / / 7       <-- lower part
+            so: 
+            */
+
+            // upper part
+            diagRowCount = 0;
+            
+            for (int i = 0; i < n; ++i)
+            {
+                int x = i;
+                for (int j = 0; j < n; ++j)
+                {
+                    int y = j;
+                    while (x >= 0 && y < n)
+                    {
+                        //Console.Write("[" + x + "," + y + "] ");
+                        if (queen[x] == y)
+                        {
+                            sDiag[diagRowCount]++;
+                        }
+
+                        --x;
+                        ++y;
+                        isUsed = false;
+                    }
+                    if (!isUsed)
+                    {
+                        isUsed = true;
+                    }
+                }
+                //Console.WriteLine();
+                diagRowCount++;
+            }
+
+            // lower part
+            for (int k = 1; k < n; ++k)
+            {
+                int x = n - 1;
+                for (int j = k; j < n; ++j)
+                {
+                    int y = j;
+                    while (x >= k - 1 && y < n)
+                    {
+                        //Console.Write("[" + x + "," + y + "] ");
+                        if (queen[x] == y)
+                        {
+                            sDiag[diagRowCount]++;
+                        }
+
+                        --x;
+                        ++y;
+                        isUsed = false;
+                    }
+                    if (!isUsed)
+                    {
+                        isUsed = true;
+                    }
+                }
+                //Console.WriteLine();
+                diagRowCount++;
+            }
+
+            return sDiag;
+        }
+
         /// <summary>
         /// Prints the queens positions in a matrix shape for n less than 10 or in a list shape 
         /// </summary>
@@ -206,23 +412,23 @@ namespace NQueenSusicGu
                     {
                         if (board[i] == j)
                         {
-                            Console.Write($"{board[i]} ");
+                            //Console.Write($"{board[i]} ");
                         }
                         else
                         {
-                            Console.Write("_ ");
+                            //Console.Write("_ ");
                         }
                     }
-                    Console.WriteLine();
+                    //Console.WriteLine();
                 }
             }
             else
             {
                 for (int i = 0; i < board.Length; i++)
                 {
-                    Console.Write($"{board[i]}, ");
+                    //Console.Write($"{board[i]}, ");
                 }
-                Console.WriteLine();
+                //Console.WriteLine();
             }
         }
     }
