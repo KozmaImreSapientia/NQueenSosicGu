@@ -11,7 +11,7 @@ namespace NQueenSusicGu
     {
         static void Main(string[] args)
         {
-            NQueenSusic(4);
+            NQueenSusic(1000);
         }
 
         /// <summary>
@@ -22,14 +22,14 @@ namespace NQueenSusicGu
         {
             int noOfSwaps, noOfCollisions;
             int[] queen;
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            Stopwatch sw;
             do {
                 queen = InitializeWithRandomPermutation(n);
                 Console.WriteLine("Initial state:");
                 PrintQueens(queen);
                 int attackScore;
-               
+                sw = new Stopwatch();
+                sw.Start();
                 noOfCollisions = CalculateCollisions(queen);
                 do {
                     noOfSwaps = 0;
@@ -37,6 +37,7 @@ namespace NQueenSusicGu
                     {
                         for (int j = i + 1; j < n; ++j)
                         {
+                            Console.WriteLine("hgdszz");
                             if (IsAttacked(queen, i, out attackScore) || IsAttacked(queen, j, out attackScore))
                             {
                                 int[] secondBoard = Swap(queen, i, j);
