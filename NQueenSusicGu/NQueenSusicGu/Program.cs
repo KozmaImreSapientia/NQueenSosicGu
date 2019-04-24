@@ -46,7 +46,41 @@ namespace NQueenSusicGu
 
         private static int[] InitializeWithRandomPermutation(int n)
         {
-            return new int[1];
+            int[] array = new int[n];
+
+            for(int i = 0; i < n; i++)
+            {
+                array[i] = i;
+            }
+
+            /*for(int i = 0; i < n; i++)
+            {
+                Console.Write(array[i]+" ");
+            }*/
+
+            FisherYatesShuffle(array);
+
+            /*Console.WriteLine();
+            for (int i = 0; i < n; i++)
+            {
+                Console.Write(array[i] + " ");
+            }*/
+
+            return array;
+        }
+
+        private static void FisherYatesShuffle(int[] array)
+        {
+            Random rand = new Random();
+            int n = array.Count();
+            for (int i = n - 1; i > 0; i--)
+            {
+                int j = rand.Next(0, i + 1);
+
+                int temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
         }
 
         private static int[] Swap(int[] queen,int i, int j)
