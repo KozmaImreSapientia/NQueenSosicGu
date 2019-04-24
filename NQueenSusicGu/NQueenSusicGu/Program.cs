@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +11,23 @@ namespace NQueenSusicGu
     {
         static void Main(string[] args)
         {
-
+            NQueenSusic(4);
         }
 
+        /// <summary>
+        /// Solves the N queen problem and writes to the console the solution and the time needed to reach it
+        /// </summary>
+        /// <param name="n">The problems dimension</param>
         private static void NQueenSusic(int n)
         {
             int noOfSwaps, noOfCollisions;
+            int[] queen;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             do {
-                int[] queen = InitializeWithRandomPermutation(n);
+                queen = InitializeWithRandomPermutation(n);
+                Console.WriteLine("Initial state:");
+                PrintQueens(queen);
                 int attackScore;
                
                 noOfCollisions = CalculateCollisions(queen);
@@ -42,6 +52,10 @@ namespace NQueenSusicGu
                     }
                 } while (noOfSwaps != 0);
             } while (noOfCollisions != 0);
+            sw.Stop();
+            Console.WriteLine($"Time needed: {sw.Elapsed}");
+            Console.WriteLine("Solved state");
+            PrintQueens(queen);
         }
 
         private static int[] InitializeWithRandomPermutation(int n)
@@ -137,7 +151,7 @@ namespace NQueenSusicGu
             // diagonal attack:
             int distance;
             bool A, B;
-            for (int i=0; i<queen.GetLength(0); ++i)
+            for (int i=0; i<queen.Length; ++i)
             {
                 if (i == position)
                 {
@@ -175,6 +189,40 @@ namespace NQueenSusicGu
                 }
             }
             return finalAttackScore;
+        }
+
+        /// <summary>
+        /// Prints the queens positions in a matrix shape for n less than 10 or in a list shape 
+        /// </summary>
+        /// <param name="board">The array containing the positions of the queens</param>
+        private static void PrintQueens(int[] board)
+        {
+            if (board.Length <= 10)
+            {
+                for (int i = 0; i < board.Length; i++)
+                {
+                    for (int j = 0; j < board.Length; j++)
+                    {
+                        if (board[i] == j)
+                        {
+                            Console.Write($"{board[i]} ");
+                        }
+                        else
+                        {
+                            Console.Write("_ ");
+                        }
+                    }
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < board.Length; i++)
+                {
+                    Console.Write($"{board[i]}, ");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
