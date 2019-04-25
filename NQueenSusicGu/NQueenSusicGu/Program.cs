@@ -12,6 +12,7 @@ namespace NQueenSusicGu
         static void Main(string[] args)
         {
             NQueenSusic(1000);
+            NQueenSusic2(1000);
         }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace NQueenSusicGu
             do {
                 queen = InitializeWithRandomPermutation(n);
                 Console.WriteLine("Initial state:");
-                PrintQueens(queen);
+                //PrintQueens(queen);
                 int attackScore;
                 sw = new Stopwatch();
                 sw.Start();
@@ -37,7 +38,7 @@ namespace NQueenSusicGu
                     {
                         for (int j = i + 1; j < n; ++j)
                         {
-                            Console.WriteLine("hgdszz");
+                            //Console.WriteLine("hgdszz");
                             if (IsAttacked(queen, i, out attackScore) || IsAttacked(queen, j, out attackScore))
                             {
                                 int[] secondBoard = Swap(queen, i, j);
@@ -56,7 +57,53 @@ namespace NQueenSusicGu
             sw.Stop();
             Console.WriteLine($"Time needed: {sw.Elapsed}");
             Console.WriteLine("Solved state");
-            PrintQueens(queen);
+            //PrintQueens(queen);
+        }
+
+        private static void NQueenSusic2(int n)
+        {
+            int noOfSwaps, noOfCollisions;
+            int[] queen;
+            Stopwatch sw;
+            do
+            {
+                queen = InitializeWithRandomPermutation(n);
+                Console.WriteLine("Initial state:");
+                //PrintQueens(queen);
+                int attackScore;
+                sw = new Stopwatch();
+                sw.Start();
+                noOfCollisions = CalculateCollisions(queen);
+                do
+                {
+                    noOfSwaps = 0;
+                    for (int i = 0; i < n; ++i)
+                    {
+                        for (int j = i + 1; j < n; ++j)
+                        {
+                            //Console.WriteLine("hgdszz");
+                            if (IsAttacked(queen, i, out attackScore) || IsAttacked(queen, j, out attackScore))
+                            {
+                                Swap2(queen, i, j);
+                                int noOfCol = CalculateCollisions(queen);
+                                if (noOfCol < noOfCollisions)
+                                {
+                                    noOfCollisions = noOfCol;
+                                    noOfSwaps++;
+                                }
+                                else
+                                {//back to initial state
+                                    Swap2(queen, j, i);
+                                }
+                            }
+                        }
+                    }
+                } while (noOfSwaps != 0);
+            } while (noOfCollisions != 0);
+            sw.Stop();
+            Console.WriteLine($"Time needed: {sw.Elapsed}");
+            Console.WriteLine("Solved state");
+            //PrintQueens(queen);
         }
 
         private static int[] InitializeWithRandomPermutation(int n)
@@ -96,6 +143,13 @@ namespace NQueenSusicGu
                 array[i] = array[j];
                 array[j] = temp;
             }
+        }
+
+        private static void Swap2(int[] queen, int i, int j)
+        {
+            int aux = queen[i];
+            queen[i] = queen[j];
+            queen[j] = aux;
         }
 
         private static int[] Swap(int[] queen,int i, int j)
@@ -152,7 +206,7 @@ namespace NQueenSusicGu
             // diagonal attack:
             int distance;
             bool A, B;
-            for (int i=0; i<queen.Length; ++i)
+            for (int i=position; i<queen.Length; ++i)
             {
                 if (i == position)
                 {
