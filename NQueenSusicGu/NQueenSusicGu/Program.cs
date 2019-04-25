@@ -9,26 +9,31 @@ namespace NQueenSusicGu
 {
     class Program
     {
+        private static int[] mDiag;
+        private static int[] sDiag;
+
         static void Main(string[] args)
         {
-            NQueenSusic(1000);
-            NQueenSusic2(1000);
+            NQueenSusic2(18000);
+
 
             //int[] testQueen = new int[6] { 1,5,0,2,3,4 };
             //int C = CalculateDiagonalCollisions(testQueen);
 
 
-            int[] tests = new int[11] { 4, 6, 10, 25, 50, 100, 200, 300, 500, 1000, 10000 };
+            //int[] tests = new int[12] { 4, 6, 10, 25, 50, 100, 200, 300, 500, 1000, 10000, 18000 };
 
-            foreach (int i in tests)
-            {
-                Console.Write(i + " : ");
-                NQueenSusic(i);
-            }
+            //foreach (int i in tests)
+            //{
+            //    Console.Write(i + " : ");
+            //    //NQueenSusic(i);
+            //    Console.WriteLine("v2: ");
+            //    NQueenSusic2(i);
+            //}
 
-            Console.WriteLine("Done");
-            while (true)
-                Console.Read();
+            //Console.WriteLine("Done");
+            //while (true)
+            //    Console.Read();
 
         }
 
@@ -44,7 +49,7 @@ namespace NQueenSusicGu
             do {
                 queen = InitializeWithRandomPermutation(n);
                 //Console.WriteLine("Initial state:");
-                PrintQueens(queen);
+                //PrintQueens(queen);
                 int attackScore;
                 sw = new Stopwatch();
                 sw.Start();
@@ -75,7 +80,7 @@ namespace NQueenSusicGu
             } while (noOfCollisions != 0);
             sw.Stop();
             Console.WriteLine($"Time needed: {sw.Elapsed}");
-            Console.WriteLine("Solved state");
+            //Console.WriteLine("Solved state");
             //PrintQueens(queen);
         }
 
@@ -87,12 +92,12 @@ namespace NQueenSusicGu
             do
             {
                 queen = InitializeWithRandomPermutation(n);
+                InitializeDiagonalArrays(queen);
                 Console.WriteLine("Initial state:");
                 //PrintQueens(queen);
-                int attackScore;
                 sw = new Stopwatch();
                 sw.Start();
-                noOfCollisions = CalculateCollisions(queen);
+                noOfCollisions = CalculateCollisions2(queen);
                 do
                 {
                     noOfSwaps = 0;
@@ -101,14 +106,15 @@ namespace NQueenSusicGu
                         for (int j = i + 1; j < n; ++j)
                         {
                             //Console.WriteLine("hgdszz");
-                            if (IsAttacked(queen, i, out attackScore) || IsAttacked(queen, j, out attackScore))
+                            if (IsAttacked2(queen, i) || IsAttacked2(queen, j))
                             {
                                 Swap2(queen, i, j);
-                                int noOfCol = CalculateCollisions(queen);
+                                int noOfCol = CalculateCollisions2(queen);
                                 if (noOfCol < noOfCollisions)
                                 {
                                     noOfCollisions = noOfCol;
                                     noOfSwaps++;
+                                    //RefreshDiagonalArrays(queen,i,j);
                                 }
                                 else
                                 {//back to initial state
@@ -121,15 +127,15 @@ namespace NQueenSusicGu
             } while (noOfCollisions != 0);
             sw.Stop();
             Console.WriteLine($"Time needed: {sw.Elapsed}");
-            //Console.WriteLine("Solved state");
-            PrintQueens(queen);
+            Console.WriteLine("Solved state");
+            //PrintQueens(queen);
         }
 
         private static int[] InitializeWithRandomPermutation(int n)
         {
             int[] array = new int[n];
 
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 array[i] = i;
             }
@@ -166,9 +172,67 @@ namespace NQueenSusicGu
 
         private static void Swap2(int[] queen, int i, int j)
         {
+            //remove the collision for "source" queens
+            mDiag[MDiagIndex(i, queen[i], queen.Length)]--;
+            sDiag[i + queen[i]]--;
+            mDiag[MDiagIndex(j, queen[j], queen.Length)]--;
+            sDiag[j + queen[j]]--;
+
             int aux = queen[i];
             queen[i] = queen[j];
             queen[j] = aux;
+
+            //refresh the collisions for "destination" queens
+            mDiag[MDiagIndex(i, queen[i], queen.Length)]++;
+            sDiag[i + queen[i]]++;
+            mDiag[MDiagIndex(j, queen[j], queen.Length)]++;
+            sDiag[j + queen[j]]++;
+        }
+
+        private static int MDiagIndex(int i, int j, int dimension)
+        {
+            return -(i - j) + dimension - 1;
+        }
+
+        private static bool IsAttacked2(int[] queen, int position)
+        {
+            if (mDiag[MDiagIndex(position, queen[position], queen.Length)] > 1)
+            {
+                return true;
+            }
+            if (sDiag[position + queen[position]] > 1)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static void InitializeDiagonalArrays(int[] queen)
+        {
+            mDiag = new int[2 * queen.Length - 1];
+            sDiag = new int[2 * queen.Length - 1];
+            for (int position = 0; position < queen.Length; ++position)
+            {
+                mDiag[MDiagIndex(position, queen[position], queen.Length)]++;
+                sDiag[position + queen[position]]++;
+            }
+        }
+
+        private static int CalculateCollisions2(int[] queen)
+        {
+            int collisions = 0;
+            for(int i = 0; i < mDiag.Length; ++i)
+            {
+                if (mDiag[i] > 1)
+                {
+                    collisions += mDiag[i] - 1;
+                }
+                if (sDiag[i] > 1)
+                {
+                    collisions += sDiag[i] - 1;
+                }
+            }
+            return collisions;
         }
 
         private static int[] Swap(int[] queen,int i, int j)
@@ -178,14 +242,14 @@ namespace NQueenSusicGu
 
             int[] temp = new int [size];
             // quenn[0,1,i,3,j,5] swap i with j
-             for(int q = 0; q < size; ++q)
+            for(int q = 0; q < size; ++q)
             {
                 
                 if (q == i)
                 {
                     temp[q] = queen[j];
                 }
-               else if  (q == j)
+                else if  (q == j)
                 {
                     temp[q] = queen[i];
                 }
@@ -268,8 +332,8 @@ namespace NQueenSusicGu
         private static int CalculateDiagonalCollisions(int[] queen)
         {
             // Calculate main and secondary diagonals:
-            int[] mDiag = AttackCounterOnMainDiagonal(queen);
-            int[] sDiag = AttackCounterOnSecondaryDiagonal(queen);
+            //int[] mDiag = AttackCounterOnMainDiagonal(queen);
+            //int[] sDiag = AttackCounterOnSecondaryDiagonal(queen);
 
             // Calculate collision count:
             int counter = 0;
