@@ -14,27 +14,60 @@ namespace NQueenSusicGu
 
         static void Main(string[] args)
         {
-            NQueenSusic2(18000);
+            //NQueenSusic2(18000);
+
+            Console.WriteLine("N Queen problem solver:");
+            Console.WriteLine("(Type ESC to exit)");
+
+            for (;;){
+
+                Console.Write("\n> Board size: ");
+                string inStr = Console.ReadLine();
+                int input;
+                try
+                {
+                    bool A = inStr.Trim().ToLower().Equals("esc");
+                    bool B = inStr.Trim().ToLower().Equals("exit");
+                    bool C = inStr.Trim().ToLower().Equals("close");
+                    bool D = inStr.Trim().ToLower().Equals("x");
+                    if ( A || B || C || D)
+                    {
+                        break;
+                    }
+                    input = Math.Abs(Int32.Parse( inStr ));
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Wrong input! Use natural numbers");
+                    continue;
+                }
+
+                NQueenSusic2( input );
+
+            }
+            
+            Console.WriteLine("\n\nPress any key to exit.");
+            Console.ReadKey();
+
+            /*
+            int[] testQueen = new int[6] { 1,5,0,2,3,4 };
+            int C = CalculateDiagonalCollisions(testQueen);
 
 
-            //int[] testQueen = new int[6] { 1,5,0,2,3,4 };
-            //int C = CalculateDiagonalCollisions(testQueen);
+            int[] tests = new int[12] { 4, 6, 10, 25, 50, 100, 200, 300, 500, 1000, 10000, 18000 };
 
+            foreach (int i in tests)
+            {
+                Console.Write(i + " : ");
+                //NQueenSusic(i);
+                Console.WriteLine("v2: ");
+                NQueenSusic2(i);
+            }
 
-            //int[] tests = new int[12] { 4, 6, 10, 25, 50, 100, 200, 300, 500, 1000, 10000, 18000 };
-
-            //foreach (int i in tests)
-            //{
-            //    Console.Write(i + " : ");
-            //    //NQueenSusic(i);
-            //    Console.WriteLine("v2: ");
-            //    NQueenSusic2(i);
-            //}
-
-            //Console.WriteLine("Done");
-            //while (true)
-            //    Console.Read();
-
+            Console.WriteLine("Done");
+            while (true)
+                Console.Read();
+            */
         }
 
         /// <summary>
@@ -80,8 +113,8 @@ namespace NQueenSusicGu
             } while (noOfCollisions != 0);
             sw.Stop();
             Console.WriteLine($"Time needed: {sw.Elapsed}");
-            //Console.WriteLine("Solved state");
-            //PrintQueens(queen);
+            Console.WriteLine("Solved state:");
+            PrintQueens(queen);
         }
 
         private static void NQueenSusic2(int n)
@@ -93,7 +126,7 @@ namespace NQueenSusicGu
             {
                 queen = InitializeWithRandomPermutation(n);
                 InitializeDiagonalArrays(queen);
-                Console.WriteLine("Initial state:");
+                //Console.WriteLine("Initial state:");
                 //PrintQueens(queen);
                 sw = new Stopwatch();
                 sw.Start();
@@ -127,8 +160,8 @@ namespace NQueenSusicGu
             } while (noOfCollisions != 0);
             sw.Stop();
             Console.WriteLine($"Time needed: {sw.Elapsed}");
-            Console.WriteLine("Solved state");
-            //PrintQueens(queen);
+            Console.WriteLine("Solved state:");
+            PrintQueens(queen);
         }
 
         private static int[] InitializeWithRandomPermutation(int n)
